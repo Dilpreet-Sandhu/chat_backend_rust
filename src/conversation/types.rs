@@ -73,3 +73,23 @@ pub struct CreateNewConversationKeysServiceType {
     pub key_version : i32,
     pub keys : Vec<DeviceEncryptionKeyService>
 }
+
+
+#[derive(Deserialize)]
+pub struct GetConversationKeysType {
+    pub conversation_id : Uuid,
+    pub device_id : Uuid
+}
+
+#[derive(FromRow)]
+pub struct ConversationKeyResponse {
+    pub key_version : i32,
+    pub encrypted_key : Vec<u8>
+}
+
+
+#[derive(Serialize)]
+pub struct ConversationKeyApiResponse {
+    pub key_version : i32,
+    pub encrypted_key : String
+}

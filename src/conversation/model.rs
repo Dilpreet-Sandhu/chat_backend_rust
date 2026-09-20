@@ -27,7 +27,7 @@ pub struct ConversationKey {
     pub id : Uuid,
     pub conversation_id : Uuid,
     pub device_id : Uuid,
-    pub key_version : u32,
+    pub key_version : i32,
     pub encrypted_key : Vec<u8>,
     pub created_at : DateTime<Utc>
 }

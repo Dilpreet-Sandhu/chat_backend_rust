@@ -10,7 +10,7 @@ use uuid::Uuid;
 use crate::{
     AppState, auth::User, conversation::{
         model::Conversation, service::ConversationService, types::{
-            AddMemberInput, ConversationType, ConversatonInput, CreateConversationInput, CreateNewConversationKeyType, CreateNewConversationKeysServiceType, DeviceEncryptionKeyService, GetMembersInput, MemberData,
+            AddMemberInput, ConversationKeyApiResponse, ConversationType, ConversatonInput, CreateConversationInput, CreateNewConversationKeyType, CreateNewConversationKeysServiceType, DeviceEncryptionKeyService, GetConversationKeysType, GetMembersInput, MemberData,
         },
     }, error::AppError, types::ApiResponse,
 };
@@ -123,4 +123,21 @@ pub async fn create_conversation_key(
         data: None,
         message: "inserted conversation key succesfully".to_string(),
     })
+}
+
+
+pub async fn get_conversation_keys(
+    State(state) : State<Arc<AppState>>,
+    Path(input) : Path<GetConversationKeysType>
+) -> Result<ApiResponse<Vec<ConversationKeyApiResponse>>,AppError> {
+
+
+    let keys = ConversationService::get_conversation_keys(input, &state.db_pool).await?;
+
+
+    Ok(ApiResponse {
+        data : Some(keys),
+        message : "fetched conversation keys succesfully".to_string()
+    })
+
 }

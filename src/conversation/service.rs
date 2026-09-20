@@ -1,11 +1,12 @@
 use std::str::FromStr;
 
+use base64::{Engine, engine::general_purpose::STANDARD};
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
 use crate::{
     conversation::{
-        model::Conversation, types::{AddMemberInput, CreateConversationInput, CreateNewConversationKeysServiceType, GetMembersInput, MemberData},
+        model::{Conversation, ConversationKey}, types::{AddMemberInput, ConversationKeyApiResponse, ConversationKeyResponse, CreateConversationInput, CreateNewConversationKeysServiceType, GetConversationKeysType, GetMembersInput, MemberData},
     }, error::AppError,
 };
 
@@ -141,6 +142,33 @@ impl ConversationService {
         .await?;
 
         Ok(())
+
+    }
+
+    pub async fn get_conversation_keys(
+        input : GetConversationKeysType,
+        db_pool: &Pool<Postgres>
+    ) -> Result<Vec<ConversationKeyApiResponse>,AppError> {
+
+        
+        let conversation_keys = sqlx::query_as::<Postgres,ConversationKeyResponse>(
+            "SELECT key_version,encrypted_key FROM CONVERSATION_KEYS 
+            WHERE device_id = $1 AND conversatiyon_id = $2
+            ORDER BY key_version"
+        ).bind(input.device_id)
+        .bind(input.conversation_id)
+        .fetch_all(db_pool)
+        .await?;
+        
+        let keys : Vec<ConversationKeyApiResponse> = conversation_keys.into_iter()
+        .map(|item| ConversationKeyApiResponse {
+
+            encrypted_key : STANDARD.encode(&item.encrypted_key),
+            key_version : item.key_version
+
+        }).collect();
+
+        Ok(keys)
 
     }
     

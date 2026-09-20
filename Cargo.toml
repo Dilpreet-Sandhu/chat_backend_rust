@@ -16,3 +16,4 @@ tokio = {version = "1.53.1",features=["full"]}
 uuid = { version = "1.12", features = ["v4","serde"] }
 jsonwebtoken = { version = "11", features = ["aws_lc_rs"] }
 base64 = "0.23.1"
+serde_with = {version = "3.23.0",features=["base64"]}
